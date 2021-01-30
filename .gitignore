@@ -6,6 +6,7 @@ __pycache__/
 .idea/
 
 #for test
+*.c
 test.py
 build/
 result/

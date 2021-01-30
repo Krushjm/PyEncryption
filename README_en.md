@@ -51,7 +51,7 @@ python py2sec.py [options] ...
                     Example: -p 3  (means you tends to encrypt python3)
 -d,  --directory    Directory of your project (if use -d, you encrypt the whole directory)
 -f,  --file         File to be transfered (if use -f, you only encrypt one file)
--m,  --maintain     List the file or the directory you don't want to transfer
+-e,  --exclude      List the file or the directory you don't want to transfer
                     Note: The directories should be suffix by path separate char ('\\' in Windows or '/'),
                     and must be the relative path to -d's value
                     Example: -m setup.py,mod/__init__.py,exclude_dir/
@@ -80,6 +80,9 @@ python3 py2sec.py -p 3 -d example/
 - py2sec.py                 main run file
 - py2sec_build.py.template  to generate setup.py file
 - requirements.txt          env to run py2sec
+
+### Notification
+1. Windows Platform should install [C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
 
 ### LICENSE
 

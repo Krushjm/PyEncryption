@@ -53,7 +53,7 @@ python py2sec.py [选项] ...
                   例: -p 3  (比如你使用python3)
 -d,  --directory  Python项目路径 (如果使用-d参数, 将编译整个Python项目)
 -f,  --file       Python文件 (如果使用-f, 将编译单个Python文件)
--m,  --maintain   标记你不想编译的文件或文件夹路径
+-e,  --exclude    标记你不想编译的文件或文件夹路径
                   注意: 文件夹需要以路径分隔符号（`/`或`\\`，依据系统而定）结尾，并且需要和-d参数一起使用 
                   例: -m setup.py,mod/__init__.py,exclude_dir/
 -x  --nthread     编译启用的线程数
@@ -79,6 +79,9 @@ python3 py2sec.py -p 3 -d example/
 - py2sec.py                 主函数文件
 - py2sec_build.py.template  用于生成 py2sec_build.py 的模板文件
 - requirements.txt          依赖库的清单
+
+### 注意事项
+1. Windows 平台需要安装 [C++ 编译工具](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
 
 ### 协议
 
