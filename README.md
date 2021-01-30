@@ -38,8 +38,6 @@ pip install requirements.txt
 
 ### 使用
 
-请将要加密的目录或文件存放在py2sec根目录下
-
 ```
 python py2sec.py [选项] ...
 ```
@@ -81,7 +79,9 @@ python3 py2sec.py -p 3 -d example/
 - requirements.txt          依赖库的清单
 
 ### 注意事项
-1. Windows 平台需要安装 [C++ 编译工具](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
+1. 请将要加密的目录或文件存放在与 `py2sec.py` 同级目录下
+2. 编译后的项目启动文件请使用以项目为根目录的导入语句，如 `from example.aaa import test1`
+3. Windows 平台需要安装 [C++ 编译工具](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
 
 ### 协议
 

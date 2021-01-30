@@ -163,7 +163,7 @@ def make_dirs(dir_path):
 def get_command_options(build_options):
     try:
         print(sys.argv[1:])
-        options, _ = getopt.getopt(sys.argv[1:], "vhp:d:f:m:x:qr", [
+        options, _ = getopt.getopt(sys.argv[1:], "vhp:d:f:e:x:qr", [
             "version", "help", "python=", "directory=", "file=", "exclude=",
             "n_jobs=", "quiet", "release"
         ])
@@ -189,11 +189,15 @@ def get_command_options(build_options):
                 build_options.root_name = value[:-1]
             else:
                 build_options.root_name = value
+            while build_options.root_name.startswith('.') or build_options.root_name.startswith('\\'):
+                build_options.root_name = build_options.root_name[1:]
         elif key in ["-f", "--file"]:
             if build_options.root_name:
                 print("Canceled. Do not use -d -f at the same time")
                 sys.exit(1)
             build_options.file_name = value
+            while build_options.file_name.startswith('.') or build_options.file_name.startswith('\\'):
+                build_options.file_name = build_options.file_name[1:]
         elif key in ["-e", "--exclude"]:
             for path_assign in value.split(","):
                 if not path_assign[-1:] in ['/', '\\']:  # if last char is not a path sep, consider it's assign a file

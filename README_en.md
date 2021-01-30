@@ -28,8 +28,6 @@ Please install Visual C++ Build Tools matches your Win version
 
 ## How to config it
 
-Please copy the directory or files to the root path of the py2sec.
-
 ```
 pip install requirements.txt
 ```
@@ -82,7 +80,9 @@ python3 py2sec.py -p 3 -d example/
 - requirements.txt          env to run py2sec
 
 ### Notification
-1. Windows Platform should install [C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
+1. Please put the project or file you want to encrypt at the same path of `py2sec.py`
+2. Please use project root path for import statements like `from example.aaa import test1` in the script used to start encryption project
+3. Windows Platform should install [C++ Build Tools](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)
 
 ### LICENSE
 

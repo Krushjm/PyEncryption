@@ -1,2 +1,3 @@
-print(1)
+from example.aaa import test2
 
+test2.abc()
