@@ -10,12 +10,18 @@ Contact:       https://github.com/Krushjm
 """
 
 import getopt
+import logging
 import os
-import sys
-import subprocess
-import shutil
 import platform
+import shutil
+import subprocess
+import sys
 from typing import Optional, List, Union
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(message)s'
+)
 
 
 class BuildOptions:
@@ -24,6 +30,7 @@ class BuildOptions:
         self.python_version = ''
         self.file_name = ''
         self.root_name = ''
+        self.mode: str = 'classical'
         self.exclude = []
         self.n_jobs = '1'
         self.quiet = "False"
@@ -88,13 +95,14 @@ def get_file_name(
             可以指定文件扩展名类型，支持以列表形式指定多个扩展名。默认为 "*"，即所有扩展名。
             举例：".txt" 或 [".jpg",".png"]
 
-        :return: 以 yield 方式返回结果
+        :return: 以 list 方式返回结果
 
-    Updated:
-        2020-04-21
-    Author:
-        nodewee (https://nodewee.github.io)
+    Updated:   2021-02-01
+    Author:    Krus Han
+    Contact:   https://github.com/Krushjm
     """
+    copy_list = []
+    compiler_list = []
 
     # ext_names
     if type(ext_names) is str:
@@ -122,27 +130,37 @@ def get_file_name(
         path_len = len(dir_path)
         for root, dirs, files in os.walk(dir_path):
             for file_name in files:
-                if not keep_file(file_name):
-                    continue
                 if path_type == 0:  # absolute path
-                    yield os.path.join(root, file_name)
+                    if not keep_file(file_name):
+                        copy_list.append(os.path.join(root, file_name))
+                    else:
+                        compiler_list.append(os.path.join(root, file_name))
                 elif path_type == 1:  # relative path
-                    yield os.path.join(
-                        root[path_len:].lstrip(os.path.sep), file_name)
+                    if not keep_file(file_name):
+                        copy_list.append(os.path.join(root[path_len:].lstrip(os.path.sep), file_name))
+                    else:
+                        compiler_list.append(os.path.join(root[path_len:].lstrip(os.path.sep), file_name))
                 else:  # file name
-                    yield file_name
+                    if not keep_file(file_name):
+                        copy_list.append(file_name)
+                    else:
+                        compiler_list.append(file_name)
     else:
         for file_name in os.listdir(dir_path):
             filepath = os.path.join(dir_path, file_name)
             if os.path.isfile(filepath):
-                #
-                if not keep_file(file_name):
-                    continue
-                #
                 if path_type == 0:
-                    yield filepath
+                    if not keep_file(file_name):
+                        copy_list.append(filepath)
+                    else:
+                        compiler_list.append(filepath)
                 else:
-                    yield file_name
+                    if not keep_file(file_name):
+                        copy_list.append(file_name)
+                    else:
+                        compiler_list.append(file_name)
+
+    return copy_list, compiler_list
 
 
 def make_dirs(dir_path):
@@ -158,14 +176,14 @@ def make_dirs(dir_path):
     if dir_path:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
+            logging.info(f'Create directory {dir_path} success')
 
 
 def get_command_options(build_options):
     try:
-        print(sys.argv[1:])
-        options, _ = getopt.getopt(sys.argv[1:], "vhp:d:f:e:x:qr", [
-            "version", "help", "python=", "directory=", "file=", "exclude=",
-            "n_jobs=", "quiet", "release"
+        options, _ = getopt.getopt(sys.argv[1:], "vhp:d:f:m:e:x:qr", [
+            "version", "help", "python=", "directory=", "file=", "mode=",
+            "exclude=", "n_jobs=", "quiet", "release"
         ])
     except getopt.GetoptError:
         print("Get options Error")
@@ -198,6 +216,11 @@ def get_command_options(build_options):
             build_options.file_name = value
             while build_options.file_name.startswith('.') or build_options.file_name.startswith('\\'):
                 build_options.file_name = build_options.file_name[1:]
+        elif key in ["-m", "--mode"]:
+            build_options.mode = value
+            if build_options.mode not in ['minimal', 'classical']:
+                raise ValueError('Argument mode value error')
+            logging.info(f'Script running mode: {value}')
         elif key in ["-e", "--exclude"]:
             for path_assign in value.split(","):
                 if not path_assign[-1:] in ['/', '\\']:  # if last char is not a path sep, consider it's assign a file
@@ -205,14 +228,13 @@ def get_command_options(build_options):
                 else:  # assign a dir
                     assign_dir = path_assign.strip('/').strip('\\')
                     tmp_dir = os.path.join(options.root_name, assign_dir)
-                    files = get_file_name(dir_path=tmp_dir,
-                                          include_sub_dir=True,
-                                          path_type=1)
+                    _, files = get_file_name(dir_path=tmp_dir,
+                                             include_sub_dir=True,
+                                             path_type=1)
                     #
                     for f in files:
                         file_path = os.path.join(assign_dir, f)
                         build_options.exclude.append(file_path)
-
         elif key in ["-x", "--n_jobs"]:
             build_options.n_jobs = value
         elif key in ["-q", "--quiet"]:
@@ -224,7 +246,8 @@ def get_command_options(build_options):
 
 
 def get_encrypt_file_list(options):
-    file2compiler = []
+    compiler = []
+    copy = []
 
     #
     if options.root_name != '':
@@ -233,25 +256,28 @@ def get_encrypt_file_list(options):
             sys.exit(1)
 
         #
-        pyfiles = get_file_name(dir_path=options.root_name,
-                                include_sub_dir=True,
-                                path_type=1,
-                                ext_names='.py')
+        copy_list, compiler_list = get_file_name(dir_path=options.root_name,
+                                                 include_sub_dir=True,
+                                                 path_type=1,
+                                                 ext_names='.py')
+        # print("others: ", copy_list)
+        # print("compiler: ", compiler_list)
 
         # filter exclude files
-        tmp_files = list(set(pyfiles) - set(options.exclude))
-        file2compiler = []
-        for f in tmp_files:
-            file2compiler.append(os.path.join(options.root_name, f))
+        tmp_files = list(set(compiler_list) - set(options.exclude))
+        for path in tmp_files:
+            compiler.append(os.path.join(options.root_name, path))
+        for path in copy_list:
+            copy.append(os.path.join(options.root_name, path))
 
     #
     if options.file_name != '':
         if options.file_name.endswith(".py"):
-            file2compiler.append(options.file_name)
+            compiler.append(options.file_name)
         else:
             print("Make sure you give the right name of py file")
 
-    return file2compiler
+    return copy, compiler
 
 
 def gen_setup(options, file2compiler):
@@ -309,7 +335,7 @@ def encrypt(options):
 
 def gen_project(options):
     make_dirs('result')
-    for file_name in get_file_name('build', True, 1, ['.so', '.pyd']):
+    for file_name in get_file_name('build', True, 1, ['.so', '.pyd'])[1]:
         src_path = os.path.join('build', file_name)
         mid_path = os.path.sep.join(file_name.split(os.path.sep)[1:-1])
         file_name_parts = os.path.basename(src_path).split('.')
@@ -319,19 +345,51 @@ def gen_project(options):
         shutil.copy(src_path, path)
     if options.release:
         clean_temp_files()
-    print("\nPy2Sec Encrypt Finished")
+
+
+def process_directory(origin_path):
+    logging.info('Start processing directory...')
+
+    prefix = 'result'
+    make_dirs(prefix)
+    make_dirs(os.path.join(prefix, origin_path))
+
+    for root, dirs, files in os.walk(origin_path):
+        for d in dirs:
+            make_dirs(os.path.join(prefix, root, d))
+
+    logging.info('Processing directory success')
+
+
+def process_copy(mode, copy_list):
+    logging.info('Start processing copy')
+
+    if mode == 'minimal':
+        logging.info('Script running mode is minimal, skip')
+        return
+
+    prefix = 'result'
+    for path in copy_list:
+        shutil.copy(path, os.path.join(prefix, path))
+        logging.info(f'Copy file {path} to {os.path.join(prefix, path)} success')
+
+    logging.info('Processing copy success')
 
 
 if __name__ == "__main__":
-    opts = get_command_options(BuildOptions())
-    will_compile_files = get_encrypt_file_list(opts)
     clean_build_dirs()
+    opts = get_command_options(BuildOptions())
+    process_directory(opts.root_name)
+    file2copy, file2compile = get_encrypt_file_list(opts)
     if not is_windows:
-        gen_setup(opts, will_compile_files)
+        gen_setup(opts, file2compile)
         encrypt(opts)
     else:  # Windows OS
-        for file in will_compile_files:
+        for file in file2compile:
             gen_setup(opts, [file])
             encrypt(opts)
 
     gen_project(opts)
+    process_copy(opts.mode, file2copy)
+
+    logging.info('Encryption finished')
