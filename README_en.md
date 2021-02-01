@@ -49,6 +49,10 @@ python py2sec.py [options] ...
                     Example: -p 3  (means you tends to encrypt python3)
 -d,  --directory    Directory of your project (if use -d, you encrypt the whole directory)
 -f,  --file         File to be transfered (if use -f, you only encrypt one file)
+-m   --mode         only effective when use -d option, value is 'minimal', 'classic' or 'inplace'
+                        minimal: compiler .py files store it in result directory
+                        classic: compiler .py files and copy other files in result directory
+                        inplace: compiler .py files store it in origin directory and delete origin .py file (TODO)
 -e,  --exclude      List the file or the directory you don't want to transfer
                     Note: The directories should be suffix by path separate char ('\\' in Windows or '/'),
                     and must be the relative path to -d's value

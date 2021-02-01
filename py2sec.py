@@ -54,9 +54,13 @@ Options:
   -h,  --help       Show the help info
   -p,  --python     Python version, default is based on the version of python you bind with command "python" 
                     Example: -p 3  (means you tends to encrypt python3)
-  -d,  --directory  Directory of your project (if use -d, you encrypt the whole directory)
   -f,  --file       File to be transferred (if use -f, you only encrypt one file)
-  -e,  --exclude   List the file or the directory you don't want to transfer
+  -d,  --directory  Directory of your project (if use -d, you encrypt the whole directory)
+  -m   --mode       only effective when use -d option, value is 'minimal', 'classic' or 'inplace'
+                        minimal: compiler .py files store it in result directory
+                        classic: compiler .py files and copy other files in result directory
+                        inplace: compiler .py files store it in origin directory and delete origin .py file
+  -e,  --exclude    List the file or the directory you don't want to transfer
                     Note: The directories should be suffix by path separate char ('\\' in Windows or '/'), 
                     and must be the relative path to -d's value
                     Example: -m setup.py,mod/__init__.py,exclude_dir/
@@ -362,7 +366,7 @@ def process_directory(origin_path):
 
 
 def process_copy(mode, copy_list):
-    logging.info('Start processing copy')
+    logging.info('Start processing copy...')
 
     if mode == 'minimal':
         logging.info('Script running mode is minimal, skip')

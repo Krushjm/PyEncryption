@@ -48,14 +48,18 @@ python py2sec.py [选项] ...
 -v,  --version    显示 py2sec 版本
 -h,  --help       显示帮助菜单
 -p,  --pyth       Python的版本, 默认为 你的 "python" 命令绑定的python版本
-                  例: -p 3  (比如你使用python3)
--d,  --directory  Python项目路径 (如果使用-d参数, 将编译整个Python项目)
--f,  --file       Python文件 (如果使用-f, 将编译单个Python文件)
+                  例: -p 3  (比如你使用 python3)
+-d,  --directory  Python 项目路径 (如果使用 -d 参数, 将编译整个 Python 项目)
+-f,  --file       Python 文件 (如果使用 -f, 将编译单个 Python 文件)
+-m   --mode       运行模式，仅在使用 -d 时有效，值为 'minimal'，'classic' 或 'inplace'
+                        minimal: 编译 .py 文件并存放到 result 文件夹下
+                        classic: 编译 .py 文件并将其他项目文件一起存放到 result 文件夹下
+                        inplace: 编译 .py 文件存放到源文件夹下，并删除源文件（未实现）
 -e,  --exclude    标记你不想编译的文件或文件夹路径
                   注意: 文件夹需要以路径分隔符号（`/`或`\\`，依据系统而定）结尾，并且需要和-d参数一起使用 
                   例: -m setup.py,mod/__init__.py,exclude_dir/
 -x  --nthread     编译启用的线程数
--q  --quiet       静默模式，默认False
+-q  --quiet       静默模式，默认 False
 -r  --release     Release 模式，清除所有中间文件，只保留加密结果文件，默认False
 ```
 
