@@ -1,6 +1,22 @@
-# py2sec
+# PyEncryption
 
-[English Readme](https://github.com/cckuailong/py2sec/blob/master/README_en.md)
+[English Readme](https://github.com/Krushjm/PyEncryption/blob/master/README_en.md)
+
+PyEncryption 是一个基于 [py2sec](https://github.com/cckuailong/py2sec) / [py2so](https://github.com/cckuailong/py2so) 项目的 Python 文件加密脚本
+
+### New
+
+* 增加命令行参数 `-m / --mode`，当 `mode='classical' 时，将原项目所有文件拷贝到目标路径中，具体参数请参考文档
+
+### Change
+
+* 原命令行参数 `-m / --maintain` 修改为 `-e / --exclude`
+
+### Fix
+
+* 在 Windows 系统下文件路径 `.\` 导致无法编译的问题
+
+以下为文档（有更新内容）
 
 py2sec 一款轻量的脚本工具，基于 Cython 将 .py 编译成 run-time libraries 文件：.so (Linux && Mac)，或 .pyd (Win)。一定程度上实现了“加密”保护源代码的需求。
 

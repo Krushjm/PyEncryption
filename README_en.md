@@ -1,6 +1,22 @@
-# py2sec
+# PyEncryption
 
-[中文 Readme](https://github.com/cckuailong/py2sec/blob/master/README.md)
+[Chinese Readme](https://github.com/Krushjm/PyEncryption/blob/master/README.md)
+
+PyEncryption is a command line tool for encrypting python code based on [py2sec](https://github.com/cckuailong/py2sec) and [py2so](https://github.com/cckuailong/py2so)
+
+### New
+
+* add command line option `-m / --mode`, when `mode='classical`, copy all files in origin directory to target directory, please check document for more use
+
+### Change
+
+* change `-m / --maintain` to `-e / --exclude`
+
+### Fix
+
+* compiler error when has `.\` in directory path on Windows platform
+
+origin document (updated):
 
 ## OS Support
 
